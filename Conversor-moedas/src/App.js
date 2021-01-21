@@ -34,8 +34,16 @@ function App() {
       setValueConvertTo(1.00)
     }
 
-    setResultConvert()
-  }, [valueConvertTo, valueConvert, convertFrom, convertTo])
+    if(convertFrom === 'BRL') {
+
+      setResultConvert(valueConvertFrom / valueConvertTo)
+    } else if(convertTo === 'BRL') {
+
+      setResultConvert(valueConvertFrom * valueConvertTo)
+    } else {
+
+    }
+  }, [])
 
   function handleValueConvert(e) {
     setValueConvert(e.target.value)
@@ -71,20 +79,6 @@ function App() {
       })
     }
   }
-
-
-  // useEffect(() => {
-  //   console.log('coinNames', coinNames)
-  //   console.log('convertFrom', convertFrom)
-  //   console.log('convertTo', convertTo)
-  //   console.log('convertDate', convertDate)
-  //   console.log('valueConvertFrom', valueConvertFrom)
-  //   console.log('valueConvertTo', valueConvertTo)
-  //   console.log('valueConvert', valueConvert)
-  //   console.log('resultConvert', resultConvert)
-  // }, [coinNames, resultConvert, convertTo, convertDate,
-  //   valueConvertTo, valueConvertFrom, valueConvert, convertFrom])
-
 
   return (
     <main>
