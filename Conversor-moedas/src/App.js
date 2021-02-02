@@ -25,28 +25,8 @@ function App() {
       })
   }, [])
 
-  useEffect(() => {
-    if(convertFrom === 'BRL') {
-      setValueConvertFrom(1.00)
-    }
-
-    if(convertTo === 'BRL') {
-      setValueConvertTo(1.00)
-    }
-
-    if(convertFrom === 'BRL') {
-
-      setResultConvert(valueConvertFrom / valueConvertTo)
-    } else if(convertTo === 'BRL') {
-
-      setResultConvert(valueConvertFrom * valueConvertTo)
-    } else {
-
-    }
-  }, [])
-
   function handleValueConvert(e) {
-    setValueConvert(e.target.value)
+    setValueConvert(parseFloat(e.target.value))
   }
 
   function handleSelectDate(e) {
@@ -62,22 +42,44 @@ function App() {
     setConvertTo(e.target.value)
   }
 
+  function calculateValue() {
+    if(valueConvert !== 0) {
+      if(valueConvertTo !== 0 || valueConvertFrom !== 0) {
+        if(convertTo === 'BRL') {
+          setValueConvertTo(1.00)
+        }
+
+        if(convertFrom === 'BRL' && convertTo === 'BRL') {
+          setResultConvert(valueConvert)
+        } else if(convertFrom === 'BRL') {
+          setResultConvert(valueConvert * valueConvertTo)
+        } else if(convertTo === 'BRL') {
+          setResultConvert(valueConvert / valueConvertFrom)
+        } else {
+          setResultConvert((valueConvertFrom / valueConvertTo) * valueConvert)
+        }
+      }
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
 
-    if(convertFrom !== '' && convertFrom !== 'BRL') {
+    if(convertFrom !== 'BRL') {
       axios.get(`https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaDia(moeda=@moeda,dataCotacao=@dataCotacao)?@moeda='${convertFrom}'&@dataCotacao='${convertDate}'&$top=100&$format=json`)
       .then(response => {
-        setValueConvertFrom(response.data.value[4].cotacaoVenda)
+        setValueConvertFrom(response.data.value[response.data.value.length - 1].cotacaoVenda)
       })
     }
 
-    if(convertTo !== '' && convertTo !== 'BRL') {
+    if(convertTo !== 'BRL') {
       axios.get(`https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaDia(moeda=@moeda,dataCotacao=@dataCotacao)?@moeda='${convertTo}'&@dataCotacao='${convertDate}'&$top=100&$format=json`)
       .then(response => {
-        setValueConvertTo(response.data.value[4].cotacaoVenda)
+        setValueConvertTo(response.data.value[response.data.value.length - 1].cotacaoVenda)
       })
     }
+
+    calculateValue()
   }
 
   return (
@@ -90,7 +92,7 @@ function App() {
         </div>
         <div className="valueConverted">
           <h2>Valor a ser convertido</h2>
-          <input type="number" defaultValue={0} onChange={handleValueConvert} />
+          <input type="text" defaultValue={0} onChange={handleValueConvert} />
         </div>
         <div className="selectCurrency">
           <h2>Converter de:</h2>
